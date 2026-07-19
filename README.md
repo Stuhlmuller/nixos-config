@@ -92,12 +92,9 @@ available commands. Override the configuration for another host with
 `make HOST=<host-name>`.
 
 The configuration installs `curl`, Git/GitHub CLI, GnuPG, `jq`, `nixfmt`, and
-`ripgrep` for all users. It also enables Starship's Gruvbox Rainbow prompt and
+`ripgrep` for all users. It also enables Starship with its default prompt and
 installs MesloLGS Nerd Font. Language runtimes, services, and infrastructure
 CLIs belong in project flakes.
-
-Select `MesloLGS Nerd Font` in each terminal application's font settings so the
-prompt's Powerline separators and icons render correctly.
 
 ## Repository layout
 
