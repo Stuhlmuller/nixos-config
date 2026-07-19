@@ -5,7 +5,7 @@ the base command-line tools system-wide and enables `direnv` for project flakes.
 
 ## Onboard the Mac
 
-Run each block in Terminal.
+Complete the one-time prerequisites below, then run `make` from this repository.
 
 ### 1. Confirm the target
 
@@ -64,25 +64,18 @@ cd "$HOME/github-repositories/nixos-config"
 
 ### 5. Build and apply the system
 
-Evaluate and build before changing macOS:
+Run the default workflow. It checks and builds the configuration before asking
+for administrator access to activate it:
 
 ```sh
-nix flake check
-nix build .#darwinConfigurations.Rodmans-MacBook-Pro.system --no-link
+make
 ```
 
-Bootstrap `nix-darwin` and activate this configuration:
+Open a new Terminal after it finishes, then verify the installed system and
+tools:
 
 ```sh
-sudo nix run github:nix-darwin/nix-darwin/master#darwin-rebuild -- \
-  switch --flake .#Rodmans-MacBook-Pro
-```
-
-Open a new Terminal, then verify the installed system and tools:
-
-```sh
-darwin-version
-command -v darwin-rebuild curl direnv gh git gpg jq nixfmt rg
+make verify
 ```
 
 ## Apply later changes
@@ -90,10 +83,38 @@ command -v darwin-rebuild curl direnv gh git gpg jq nixfmt rg
 From this repository, run:
 
 ```sh
-nix flake check
-sudo darwin-rebuild switch --flake .#Rodmans-MacBook-Pro
+make
 ```
+
+Use `make check` to validate only, `make build` to build without activating,
+`make switch` to activate without rebuilding first, or `make help` to list all
+available commands. Override the configuration for another host with
+`make HOST=<host-name>`.
 
 The configuration installs `curl`, Git/GitHub CLI, GnuPG, `jq`, `nixfmt`, and
 `ripgrep` for all users. Language runtimes, services, and infrastructure CLIs
 belong in project flakes.
+
+## Repository layout
+
+```text
+flake.nix                  Flake inputs and named system outputs
+Makefile                   Check, build, activate, and verify commands
+hosts/darwin/              One entry point per Mac installation
+lib/                       Constructors shared by system outputs
+modules/darwin/            Small, reusable nix-darwin configuration modules
+packages/                  Package collections grouped by purpose
+profiles/darwin/           Roles composed from reusable modules
+themes/                    Shared application theme presets
+users/                     User identity and user-specific system settings
+```
+
+To add another Mac, create `hosts/darwin/<host>/default.nix` and add a matching
+`darwinConfigurations.<host>` call in `flake.nix`. Put settings shared by
+multiple Macs in `modules/darwin/`, then compose them into a profile rather than
+copying them between hosts.
+
+Each user directory owns its hardcoded identity and platform modules. For
+example, `users/themanofrod/default.nix` declares the account name and points to
+that user's nix-darwin module. Other parts of the configuration consume this
+user object without repeating the username.
