@@ -8,4 +8,5 @@ with pkgs;
   jq
   nixfmt
   ripgrep
+  starship
 ]
