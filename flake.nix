@@ -1,45 +1,55 @@
 {
-  description = "Rodman's nix-darwin configuration";
+  description = "NixOS systems and tools";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-  };
+    # Pin our primary nixpkgs repository. This is the main nixpkgs repository
+    # we'll use for our configurations. Be very careful changing this because
+    # it'll impact your entire system.
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
 
-  outputs =
-    { self, nix-darwin, ... }:
-    {
-      darwinConfigurations."Rodmans-MacBook-Pro" = nix-darwin.lib.darwinSystem {
-        modules = [
-          (
-            { pkgs, ... }:
-            {
-              environment.systemPackages = with pkgs; [
-                curl
-                gh
-                git
-                gnupg
-                jq
-                nixfmt
-                ripgrep
-              ];
+    # We use the unstable nixpkgs repo for some packages.
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-              nix.settings.experimental-features = [
-                "nix-command"
-                "flakes"
-              ];
-
-              programs.direnv.enable = true;
-
-              system.primaryUser = "themanofrod";
-              system.configurationRevision = self.rev or self.dirtyRev or null;
-              system.stateVersion = 6;
-
-              nixpkgs.hostPlatform = "aarch64-darwin";
-            }
-          )
-        ];
-      };
+    home-manager = {
+      # We need to use nightly home-manager because it contains this
+      # fix we need for nushell nightly:
+      # https://github.com/nix-community/home-manager/commit/a69ebd97025969679de9f930958accbe39b4c705
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  }
+
+  outputs = { nixpkgs, ... }@inputs: let
+    # Overlays is the list of overlays we want to apply from flake inputs.
+    overlays = [
+
+      (_final: prev: let
+        system = prev.stdenv.hostPlatform.system;
+        unstable = import inputs.nixpkgs-unstable {
+          inherit system;
+        };
+      in {
+        # gh CLI on stable has bugs.
+        gh = unstable.gh;
+
+        # Want the latest version of these
+        nushell = unstable.nushell;
+      })
+    ];
+
+    mkSystem = import ./lib/mksystem.nix {
+      inherit overlays nixpkgs inputs;
+    };
+  in {
+    darwinConfigurations.macbook-pro-m4 = mkSystem "macbook-pro-m4" {
+      system = "aarch64-darwin";
+      user   = "themanofrod";
+      darwin = true;
+    };
+  };
 }
