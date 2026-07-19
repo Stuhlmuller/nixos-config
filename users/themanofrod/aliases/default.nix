@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, user, ... }:
 {
-  environment.shellAliases.reload = "exec zsh -l";
+  environment.shellAliases.reload = "make -C ${lib.escapeShellArg user.nixConfigDirectory} && exec zsh -l";
 }
