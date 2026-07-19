@@ -54,7 +54,20 @@ nix config show experimental-features
 
 The final command should list both `nix-command` and `flakes`.
 
-### 4. Clone the configuration
+### 4. Install Homebrew
+
+The graphical applications are managed as Homebrew casks through nix-darwin.
+Install Homebrew before applying the configuration:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew --version
+```
+
+See [Homebrew's installation guide](https://docs.brew.sh/Installation).
+
+### 5. Clone the configuration
 
 ```sh
 mkdir -p "$HOME/github-repositories"
@@ -62,7 +75,7 @@ git clone https://github.com/Stuhlmuller/nixos-config.git "$HOME/github-reposito
 cd "$HOME/github-repositories/nixos-config"
 ```
 
-### 5. Build and apply the system
+### 6. Build and apply the system
 
 Run the default workflow. It checks and builds the configuration before asking
 for administrator access to activate it:
@@ -92,9 +105,10 @@ available commands. Override the configuration for another host with
 `make HOST=<host-name>`.
 
 The configuration installs `curl`, Git/GitHub CLI, GnuPG, `jq`, `nixfmt`, and
-`ripgrep` for all users. It also enables Starship with its default prompt and
-installs MesloLGS Nerd Font. Language runtimes, services, and infrastructure
-CLIs belong in project flakes.
+`ripgrep` for all users. It also installs the Obsidian app and CLI, the Codex
+app and CLI, and Cursor; enables Starship with its default prompt; and installs
+MesloLGS Nerd Font. Language runtimes, services, and infrastructure CLIs belong
+in project flakes.
 
 ## Repository layout
 

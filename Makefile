@@ -23,7 +23,10 @@ switch:
 
 verify:
 	darwin-version
-	@command -v darwin-rebuild curl direnv gh git gpg jq nixfmt rg
+	@command -v darwin-rebuild codex curl cursor direnv gh git gpg jq nixfmt obsidian rg
+	@test -d /Applications/Codex.app
+	@test -d /Applications/Cursor.app
+	@test -d /Applications/Obsidian.app
 
 help:
 	@echo "make          Check, build, and activate the $(HOST) configuration"
