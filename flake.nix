@@ -1,36 +1,45 @@
 {
-  description = "Portable base development shell";
+  description = "Rodman's nix-darwin configuration";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
-    { nixpkgs, ... }:
-    let
-      forEachSystem = nixpkgs.lib.genAttrs [
-        "aarch64-darwin"
-        "aarch64-linux"
-        "x86_64-linux"
-      ];
-    in
+    { self, nix-darwin, ... }:
     {
-      devShells = forEachSystem (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = pkgs.mkShellNoCC {
-            packages = with pkgs; [
-              curl
-              gh
-              git
-              gnupg
-              jq
-              nixfmt
-              ripgrep
-            ];
-          };
-        }
-      );
+      darwinConfigurations."Rodmans-MacBook-Pro" = nix-darwin.lib.darwinSystem {
+        modules = [
+          (
+            { pkgs, ... }:
+            {
+              environment.systemPackages = with pkgs; [
+                curl
+                gh
+                git
+                gnupg
+                jq
+                nixfmt
+                ripgrep
+              ];
+
+              nix.settings.experimental-features = [
+                "nix-command"
+                "flakes"
+              ];
+
+              programs.direnv.enable = true;
+
+              system.primaryUser = "themanofrod";
+              system.configurationRevision = self.rev or self.dirtyRev or null;
+              system.stateVersion = 6;
+
+              nixpkgs.hostPlatform = "aarch64-darwin";
+            }
+          )
+        ];
+      };
     };
 }
