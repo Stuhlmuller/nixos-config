@@ -8,6 +8,7 @@
       "codex-app"
       "cursor"
       "obsidian"
+      "superset"
     ];
   };
 }
