@@ -105,8 +105,8 @@ available commands. Override the configuration for another host with
 `make HOST=<host-name>`.
 
 The configuration installs `curl`, Git/GitHub CLI, GnuPG, `jq`, `nixfmt`, and
-`ripgrep` for all users. It also installs the Obsidian app and CLI, the Codex
-app and CLI, and Cursor; enables Starship with its default prompt; and installs
+`ripgrep` for all users. It also installs the Obsidian app and CLI and the Codex
+CLI; enables Starship with its default prompt; and installs
 MesloLGS Nerd Font. Language runtimes, services, and infrastructure CLIs belong
 in project flakes.
 

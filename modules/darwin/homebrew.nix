@@ -5,8 +5,6 @@
 
     casks = [
       "codex"
-      "codex-app"
-      "cursor"
       "obsidian"
       "superset"
     ];
